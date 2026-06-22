@@ -205,13 +205,20 @@ def save_shap_bar_plot(shap_result: dict, drug_name: str = "Drug"):
         spine.set_edgecolor("#2a2f45")
 
     # Legend
+    # Pinned BELOW the plot (not auto-placed via loc="best") because
+    # "best" picks whatever empty space it can find, and when bars are
+    # long/dense (e.g. a drug whose features mostly push toward TOXIC)
+    # there often isn't any — the legend ends up sitting on top of a
+    # bar, like it did for pantoprazole. Anchoring it below the axes
+    # guarantees it never covers data, regardless of how the bars look.
     from matplotlib.patches import Patch
     legend = [
         Patch(color="#ff5c5c", label="Pushes toward TOXIC"),
         Patch(color="#00c9ff", label="Pushes toward SAFE"),
     ]
-    ax.legend(handles=legend, facecolor="#1e2130",
-              labelcolor="#e0e0e0", fontsize=9)
+    ax.legend(handles=legend, facecolor="#1e2130", labelcolor="#e0e0e0",
+              fontsize=9, loc="upper center", bbox_to_anchor=(0.5, -0.12),
+              ncol=2, frameon=False)
 
     plt.tight_layout()
     path = f"shap_plots/{drug_name}_{shap_result['label']}_shap.png"
